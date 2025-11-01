@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Countdown para 22 de Novembro — Sara</title>
+  <style>
+    :root {
+      --bg: #28663d;
+      --fg: #ffd8a8;
+      --beige: #ffd8a8;
+      --card-bg: rgba(255,216,168,0.08);
+      --card-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      --btn-hover: #ffe0b0;
+      --geo-bg: rgba(255,216,168,0.06);
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .wrap {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      box-sizing: border-box;
+      flex-direction: column;
+    }
+    h1, h2 { margin: 0; }
+    .countdown {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .time-box {
+      min-width: 120px;
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      background: var(--card-bg);
+      box-shadow: var(--card-shadow);
+    }
+    .value { font-size: 2.5rem; font-weight:700; line-height:1; }
+    .label { margin-top:0.25rem; font-size:1rem; }
+    .extra-info {
+      margin-top: 1.25rem;
+      font-size: 1.0rem;
+      line-height: 1.6;
+      max-width: 780px;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.65rem 1.1rem;
+      font-size: 1rem;
+      background: var(--beige);
+      color: var(--bg);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.18s;
+    }
+    button:hover { background: var(--btn-hover); }
+    .small {
+      padding: 0.45rem 0.8rem;
+      font-size: 0.95rem;
+      border-radius: 6px;
+    }
+
+    /* Geo module styling */
+    .geo-card {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 10px;
+      background: var(--geo-bg);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+      color: var(--fg);
+      max-width: 420px;
+      width: 95%;
+    }
+    .geo-card h2 { margin: 0 0 6px 0; font-size: 16px; }
+    #distance { font-size: 22px; font-weight:700; margin: 8px 0; }
+    #arrow { font-size: 40px; display:inline-block; transform-origin:center; transition: transform 0.2s ease-out; }
+    #direction { font-size: 14px; margin-top:6px; }
+    .row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:10px; }
+    .note { font-size:0.9rem; margin-top:8px; opacity:0.95; }
+
+    /* Back button link style */
+    .back {
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid rgba(255,216,168,0.25);
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+    .back:hover { background: rgba(255,216,168,0.04); }
+
+    /* Progress bar (linear, simple, beige fill) */
+    .progress-wrap {
+      margin-top: 14px;
+      width: 90%;
+      max-width: 720px;
+      background: rgba(255,216,168,0.12);
+      border-radius: 12px;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    .progress-bar {
+      height: 18px;
+      width: 100%;
+      background: rgba(0,0,0,0.06);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--beige);
+      border-radius: 10px 0 0 10px;
+      transition: none; /* sem animação conforme pedido */
+    }
+    .progress-meta {
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+
+    /* Password input area */
+    .pw-area {
+      margin-top: 12px;
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .pw-area input[type="password"] {
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,216,168,0.18);
+      background: rgba(0,0,0,0.04);
+      color: var(--fg);
+      outline: none;
+      min-width: 180px;
+      font-size: 1rem;
+    }
+    .error-msg {
+      color: #ffb3b3;
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width:480px) {
+      .value { font-size:2rem; }
+      #arrow { font-size: 36px; }
+      #distance { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="wrap">
+    <div id="content">
+      <h1>Quanto tempo falta para a Sara fazer anos?</h1>
+      <div id="countdown" class="countdown">
+        <div class="time-box">
+          <div id="days" class="value">--</div>
+          <div class="label">Dias</div>
+        </div>
+        <div class="time-box">
+          <div id="hours" class="value">--</div>
+          <div class="label">Horas</div>
+        </div>
+        <div class="time-box">
+          <div id="minutes" class="value">--</div>
+          <div class="label">Minutos</div>
+        </div>
+      </div>
+
+      <div id="extra" class="extra-info"></div>
+
+      <div class="progress-wrap" aria-hidden="false">
+        <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+          <div id="progressFill" class="progress-fill" style="width:0%"></div>
+        </div>
+        <div id="progressMeta" class="progress-meta"></div>
+      </div>
+
+      <div class="row">
+        <button id="manualOpen" class="small">Abrir missão (manual)</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ------------- CONFIG ------------- */
+const KM_VOLTA_SOL = 940_000_000; // 940 milhões km
+const MS_IN_YEAR = 365.25 * 24 * 3600 * 1000;
+const BIRTH_DATE = new Date(1998, 10, 22); // 22 Nov 1998
+
+const GEO_TARGETS = [
+  { lat: 38.7200, lon: -9.1400, label: "Lisboa - Ponto A" },    // green
+  { lat: 38.7079, lon: -9.1366, label: "Praça do Comércio" },   // blue
+  { lat: 38.7110, lon: -9.1278, label: "Alfama" }               // orange
+];
+
+const PAGES = [
+  { pw: "green",  title: "Hoje é o teu dia,", lines: ["feito de sorrisos, aventuras e pequenas surpresas...", "Preparada?"], targetIndex: 0 },
+  { pw: "blue",   title: "Boa! Estás mais perto do tesouro.", lines: ["O mundo gira, e tu brilhas nele.", "Pronta para o próximo?"], targetIndex: 1 },
+  { pw: "orange", title: "Incrível! 🌊 Segunda fase completa!", lines: ["O caminho é feito de cores, risos e boas memórias.", "Última etapa — consegues?"], targetIndex: 2 }
+];
+
+/* ------------- DOM refs ------------- */
+let app = document.getElementById('app');
+let content = document.getElementById('content');
+let daysEl = document.getElementById('days');
+let hoursEl = document.getElementById('hours');
+let minutesEl = document.getElementById('minutes');
+let extraEl = document.getElementById('extra');
+let progressFill = document.getElementById('progressFill');
+let progressMeta = document.getElementById('progressMeta');
+
+/* ------------- helpers ------------- */
+function formatWithSpaces(n) {
+  // usa pt-PT e substitui pontos por espaços
+  return Number(n).toLocaleString('pt-PT').replace(/\./g, ' ');
+}
+
+/* ------------- Countdown & progress ------------- */
+function getTargetDate() {
+  const now = new Date();
+  let year = now.getFullYear();
+  let target = new Date(year, 10, 22, 0, 0, 0); // 22 Nov
+  if (now > target) target = new Date(year + 1, 10, 22, 0, 0, 0);
+  return target;
+}
+let target = getTargetDate();
+
+function updateCountdownAndProgress() {
+  const now = new Date();
+  let diff = target - now;
+  const today = now.getDate() === target.getDate() && now.getMonth() === target.getMonth();
+
+  if (today) {
+    // mostrar botão para iniciar missão
+    app.innerHTML = `
+      <div class="wrap">
+        <div>
+          <h1>🎉 Feliz Aniversário, Sara! 🎉</h1>
+          <div class="row">
+            <button onclick="irParaPagina1()">Clica aqui</button>
+            <button class="back" onclick="renderInitial()">Voltar</button>
+          </div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const msInMinute = 60000, msInHour = 3600000, msInDay = 86400000;
+  const days = Math.floor(diff / msInDay);
+  diff -= days * msInDay;
+  const hours = Math.floor(diff / msInHour);
+  diff -= hours * msInHour;
+  const minutes = Math.floor(diff / msInMinute);
+
+  daysEl.textContent = days;
+  hoursEl.textContent = String(hours).padStart(2, '0');
+  minutesEl.textContent = String(minutes).padStart(2, '0');
+
+  // progresso entre 22Nov anterior e 22Nov target
+  const startOfCycle = new Date(target.getFullYear(), 10, 22, 0, 0, 0);
+  startOfCycle.setFullYear(startOfCycle.getFullYear() - 1);
+  const total = target - startOfCycle;
+  const elapsed = now - startOfCycle;
+  let fraction = elapsed / total;
+  if (fraction < 0) fraction = 0;
+  if (fraction > 1) fraction = 1;
+  const percent = (fraction * 100);
+
+  const kmPercorridos = KM_VOLTA_SOL * fraction;
+  const kmRestantes = KM_VOLTA_SOL - kmPercorridos;
+
+  // total desde nascimento (milhões)
+  const anosDesdeNascimento = (now - BIRTH_DATE) / MS_IN_YEAR;
+  const kmsTotais = anosDesdeNascimento * KM_VOLTA_SOL;
+  const kmsTotaisMilhoes = (kmsTotais / 1e6).toFixed(1);
+
+  // atualizar DOM extra
+  extraEl.innerHTML = `
+    🌞 Percorridos: <b>${formatWithSpaces(Math.round(kmPercorridos))}</b> km — 
+    Faltam: <b>${formatWithSpaces(Math.round(kmRestantes))}</b> km.<br>
+    <b>${percent.toFixed(2)}%</b> completado desta volta ao Sol.<br><br>
+    Desde 22 de Novembro de 1998, já viajaste aproximadamente<br>
+    <b>${formatWithSpaces(kmsTotaisMilhoes)} milhões</b> de quilómetros.
+  `;
+
+  // atualizar barra (sem animação)
+  if (progressFill) progressFill.style.width = percent.toFixed(2) + "%";
+  if (progressMeta) progressMeta.textContent = `${percent.toFixed(2)}% completado`;
+}
+
+/* Atualizar imediatamente e a cada 15s */
+updateCountdownAndProgress();
+setInterval(() => {
+  target = getTargetDate();
+  updateCountdownAndProgress();
+}, 15000);
+
+/* ------------- NAV / PAGES / GEO ------------- */
+
+let geoWatchId = null;
+let lastTarget = null;
+let userHeading = 0;
+
+function renderInitial() {
+  app.innerHTML = `
+    <div id="content" class="wrap">
+      <h1>Quanto tempo falta para a Sara fazer anos?</h1>
+      <div id="countdown" class="countdown">
+        <div class="time-box">
+          <div id="days" class="value">--</div>
+          <div class="label">Dias</div>
+        </div>
+        <div class="time-box">
+          <div id="hours" class="value">--</div>
+          <div class="label">Horas</div>
+        </div>
+        <div class="time-box">
+          <div id="minutes" class="value">--</div>
+          <div class="label">Minutos</div>
+        </div>
+      </div>
+
+      <div id="extra" class="extra-info"></div>
+
+      <div class="progress-wrap">
+        <div class="progress-bar">
+          <div id="progressFill" class="progress-fill" style="width:0%"></div>
+        </div>
+        <div id="progressMeta" class="progress-meta"></div>
+      </div>
+
+      <div class="row">
+        <button id="manualOpen" class="small">Abrir missão (manual)</button>
+      </div>
+    </div>
+  `;
+  // reassign refs
+  content = document.getElementById('content');
+  daysEl = document.getElementById('days');
+  hoursEl = document.getElementById('hours');
+  minutesEl = document.getElementById('minutes');
+  extraEl = document.getElementById('extra');
+  progressFill = document.getElementById('progressFill');
+  progressMeta = document.getElementById('progressMeta');
+
+  // attach handler
+  const btn = document.getElementById('manualOpen');
+  if (btn) btn.onclick = irParaPagina1;
+
+  // update values immediately
+  updateCountdownAndProgress();
+}
+
+/* render a página protegida com geo, index = 0..2, fromIndex para "voltar" */
+function renderPageIndex(index, fromIndex = -1) {
+  stopGeoWatch();
+  const p = PAGES[index];
+  const tgt = GEO_TARGETS[p.targetIndex];
+
+  app.innerHTML = `
+    <div class="wrap">
+      <div style="max-width:800px; width:95%;">
+        <h2>${escapeHtml(p.title)}</h2>
+        <div style="margin-top:10px; font-size:1rem; line-height:1.6;">
+          ${p.lines.map(line => `<div>${escapeHtml(line)}</div>`).join('')}
+        </div>
+
+        <div class="geo-card">
+          <h2>📍 ${escapeHtml(tgt.label)}</h2>
+          <div id="distance">A calcular...</div>
+          <div id="arrow">⬆️</div>
+          <div id="direction">A apontar...</div>
+          <div class="note">Permite o acesso à localização do dispositivo para calcular distância e direção.</div>
+        </div>
+
+        <div class="pw-area">
+          <label for="pwInput" style="display:none">Palavra-passe</label>
+          <input id="pwInput" type="password" placeholder="Introduz a palavra-passe" aria-label="Palavra-passe">
+          <button id="pwEnter">Entrar</button>
+          <button class="back" id="pwBack">Voltar</button>
+        </div>
+        <div id="pwError" class="error-msg" style="display:none"></div>
+      </div>
+    </div>
+  `;
+
+  // attach events
+  const enterBtn = document.getElementById('pwEnter');
+  const backBtn = document.getElementById('pwBack');
+  const pwInput = document.getElementById('pwInput');
+  const pwError = document.getElementById('pwError');
+
+  if (backBtn) backBtn.onclick = () => {
+    stopGeoWatch();
+    if (fromIndex === -1) {
+      renderInitial();
+    } else if (fromIndex >= 0 && fromIndex < PAGES.length) {
+      renderPageIndex(fromIndex, fromIndex - 1);
+    } else {
+      renderInitial();
+    }
+  };
+
+  if (enterBtn) {
+    enterBtn.onclick = () => {
+      const val = (pwInput.value || "").trim().toLowerCase();
+      if (val === p.pw) {
+        // password correta
+        pwError.style.display = "none";
+        // next page or final
+        if (index + 1 < PAGES.length) {
+          renderPageIndex(index + 1, index);
+        } else {
+          paginaFinal();
+        }
+      } else {
+        pwError.textContent = "Senha incorreta! Tenta outra vez.";
+        pwError.style.display = "block";
+      }
+    };
+  }
+
+  // enable Enter key
+  if (pwInput) {
+    pwInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        enterBtn.click();
+      }
+    });
+  }
+
+  // iniciar módulo geo para este target
+  startGeoModuleForTarget(tgt);
+}
+
+/* Página 1 entry */
+function irParaPagina1() {
+  renderPageIndex(0, -1);
+}
+
+/* Página final */
+function paginaFinal() {
+  stopGeoWatch();
+  app.innerHTML = `
+    <div class="wrap">
+      <h1>💚 Obrigado pela aventura! Parabéns Sara 🎉</h1>
+      <p style="margin-top:12px; font-size:1rem;">Completaste todos os desafios — que tenhas um dia maravilhoso!</p>
+      <div class="row">
+        <button onclick="renderInitial()">Voltar ao início</button>
+      </div>
+    </div>
+  `;
+}
+
+/* Utilities */
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/* ------------- GEO MODULE ------------- */
+
+function toRad(v){ return v * Math.PI / 180; }
+function toDeg(v){ return v * 180 / Math.PI; }
+
+function calcDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371e3;
+  const φ1 = toRad(lat1), φ2 = toRad(lat2);
+  const Δφ = toRad(lat2 - lat1);
+  const Δλ = toRad(lon2 - lon1);
+  const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c; // metros
+}
+
+function calcBearing(lat1, lon1, lat2, lon2) {
+  const φ1 = toRad(lat1), φ2 = toRad(lat2);
+  const Δλ = toRad(lon2 - lon1);
+  const y = Math.sin(Δλ) * Math.cos(φ2);
+  const x = Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(Δλ);
+  const θ = Math.atan2(y, x);
+  return (toDeg(θ) + 360) % 360;
+}
+
+function updateDisplay(lat, lon, bearing) {
+  const distance = calcDistance(lat, lon, lastTarget.lat, lastTarget.lon);
+  const distEl = document.getElementById('distance');
+  const arrowEl = document.getElementById('arrow');
+  const dirEl = document.getElementById('direction');
+  if (!distEl || !arrowEl || !dirEl) return;
+
+  // distância
+  let displayDist = "";
+  if (distance < 1000) {
+    displayDist = `${Math.round(distance).toLocaleString('pt-PT')} m`;
+  } else {
+    displayDist = `${(distance/1000).toFixed(1).replace('.', ',')} km`;
+  }
+  distEl.textContent = displayDist;
+
+  // rotação flecha
+  const direction = (bearing - userHeading + 360) % 360;
+  arrowEl.style.transform = `rotate(${direction}deg)`;
+
+  // Cardinal short
+  let card = "";
+  if (bearing < 22.5 || bearing >= 337.5) card = "N";
+  else if (bearing < 67.5) card = "NE";
+  else if (bearing < 112.5) card = "E";
+  else if (bearing < 157.5) card = "SE";
+  else if (bearing < 202.5) card = "S";
+  else if (bearing < 247.5) card = "SW";
+  else if (bearing < 292.5) card = "W";
+  else card = "NW";
+
+  dirEl.textContent = `Direção: ${card} (${bearing.toFixed(0)}°)`;
+}
+
+function startGeoModuleForTarget(target) {
+  lastTarget = target;
+  stopGeoWatch();
+
+  // Geolocation
+  if (navigator.geolocation) {
+    geoWatchId = navigator.geolocation.watchPosition((pos) => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      const bearing = calcBearing(lat, lon, target.lat, target.lon);
+      updateDisplay(lat, lon, bearing);
+    }, (err) => {
+      const distEl = document.getElementById('distance');
+      if (distEl) distEl.textContent = "Não foi possível aceder à localização.";
+    }, { enableHighAccuracy: true, maximumAge: 3000, timeout: 7000 });
+  } else {
+    const distEl = document.getElementById('distance');
+    if (distEl) distEl.textContent = "Geolocation não suportado.";
+  }
+
+  // DeviceOrientation (compass)
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', handleOrientation, true);
+  }
+}
+
+function handleOrientation(event) {
+  if (event && typeof event.alpha === 'number') {
+    userHeading = event.alpha;
+  }
+}
+
+function stopGeoWatch(){
+  if (geoWatchId !== null && navigator.geolocation) {
+    try { navigator.geolocation.clearWatch(geoWatchId); } catch(e) {}
+    geoWatchId = null;
+  }
+  try { window.removeEventListener('deviceorientation', handleOrientation); } catch(e) {}
+}
+
+/* ------------- INIT ------------- */
+
+function init() {
+  // attach click delegation for manualOpen (initial render already has it)
+  document.addEventListener('click', function(e){
+    if (e.target && e.target.id === 'manualOpen') {
+      irParaPagina1();
+    }
+  });
+
+  // start with initial rendering (in case user refreshed)
+  renderInitial();
+
+  // initial update
+  updateCountdownAndProgress();
+
+  // refresh countdown/progress regularly
+  setInterval(() => {
+    target = getTargetDate();
+    updateCountdownAndProgress();
+  }, 15000);
+}
+
+window.addEventListener('beforeunload', () => {
+  stopGeoWatch();
+});
+
+init();
+</script>
+</body>
+</html>
