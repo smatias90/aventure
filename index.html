@@ -347,9 +347,20 @@ function renderInitial() {
           <div id="progressFill" class="progress-fill" style="width:0%"></div>
         </div>
         <div id="progressMeta" class="progress-meta"></div>
+      </div>  
+       <div class="row">
+        <button id="manualOpen" class="small">Abrir missão (manual)</button>
       </div>
     </div>
   `;
+
+// Just delete these lines above to open the mission 
+// <div id="progressMeta" class="progress-meta"></div>
+//      </div>  
+//       <div class="row">
+//        <button id="manualOpen" class="small">Abrir missão (manual)</button>
+//      </div>
+  
   // reassign refs
   content = document.getElementById('content');
   daysEl = document.getElementById('days');
