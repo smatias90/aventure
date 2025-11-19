@@ -208,14 +208,15 @@ const BIRTH_DATE = new Date(1992, 10, 22); // 22 Nov 1992
 
 const GEO_TARGETS = [
   { lat: 38.678562, lon: -9.157140, label: "Ponto 1" },   // green
-  { lat: 38.644882, lon: -9.232617, label: "Ponto 2" },   // blue
-  { lat: 38.521115, lon: -9.018899, label: "Ponto 3" }    // orange
+  { lat: 38.521115, lon: -9.018899, label: "Ponto 2" },   // blue
+  { lat: 38.644882, lon: -9.232617, label: "Ponto 3" }    // orange
 ];
+
 
 const PAGES = [
   { pw: "tea",  title: "Sopro das folhas 🍃", lines: ["Do Oriente vem soprar,", "Aroma leve a se soltar,","Cura a alma e traz bem-estar,","Quem me invoca, há de se acalmar"], targetIndex: 0 },
-  { pw: "paint",   title: "Magia da cor 🎨", lines: ["Pincel em dança, forma se faz,", "A cor respira, o tempo jaz,","Da peça surge calma e graça,","Fica um presente que abraça"], targetIndex: 1 },
-  { pw: "knit", title: "Segredos entre fios 🧵", lines: ["Entre fios nasce a paz", "Agulhas contam o que o tempo traz","Tece-se a ideia num caminho macio","Quem adivinhar não tem frio"], targetIndex: 2 }
+  { pw: "knit", title: "Segredos entre fios 🧵", lines: ["Entre fios nasce a paz", "Agulhas contam o que o tempo traz","Tece-se a ideia num caminho macio","Quem adivinhar não tem frio"], targetIndex: 1 },
+  { pw: "paint",   title: "Magia da cor 🎨", lines: ["Pincel em dança, forma se faz,", "A cor respira, o tempo jaz,","Da peça surge calma e graça,","Fica um presente que abraça"], targetIndex: 2 }
 ];
 
 /* ------------- DOM refs ------------- */
@@ -299,7 +300,7 @@ function updateCountdownAndProgress() {
     🌞 Percorridos: <b>${formatWithSpaces(Math.round(kmPercorridos))}</b> km — 
     Faltam: <b>${formatWithSpaces(Math.round(kmRestantes))}</b> km.<br>
     <b>${percent.toFixed(2)}%</b> completado desta volta ao Sol.<br><br>
-    Desde 22 de Novembro de 1998, já viajaste aproximadamente<br>
+    Desde 22 de Novembro de 1992, já viajaste aproximadamente<br>
     <b>${formatWithSpaces(kmsTotaisMilhoes)} milhões</b> de quilómetros.
   `;
 
